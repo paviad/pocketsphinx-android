@@ -1,31 +1,39 @@
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'com.android.tools.build:gradle:3.4.2'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        google()
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 28
         versionCode 5
         versionName "5prealpha"
         setProperty("archivesBaseName", "pocketsphinx-android-$versionName")
-	externalNativeBuild {
-	    cmake {
-	    }
-	}
-        ndk {
-	    abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
-	}
+        externalNativeBuild {
+            cmake {
+            }
+        }
+            ndk {
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
     }
     sourceSets {
          main {
@@ -33,31 +41,40 @@ android {
          }
     }
     externalNativeBuild {
-	cmake {
-    	    path "CMakeLists.txt"
-	}
+        cmake {
+                path "CMakeLists.txt"
+        }
     }
 }
 
 task mkdir {
     doLast {
+        new File('build/generated-src/csharp').mkdirs()
         new File('build/generated-src/java').mkdirs()
-	new File('build/generated-src/cpp').mkdirs()
+	    new File('build/generated-src/cpp').mkdirs()
     }
 }
 
-def sphinxbase_home = "$System.env.SPINXBASE_HOME"
+def sphinxbase_home = "$System.env.SPHINXBASE_HOME"
 def pocketsphinx_home = "$System.env.POCKETSPHINX_HOME"
 
-task swigSb(type: Exec) {
+task swigSbJava(type: Exec) {
     commandLine 'swig',
 	"-I$sphinxbase_home/include", "-I$sphinxbase_home/swig",
-	"-java", "-package", "edu.cmu.pocketsphinx",
-	"-outdir", "build/generated-src/java", "-o", "build/generated-src/cpp/sphinxbase_wrap.c",
+    "-java", "-package", "edu.cmu.pocketsphinx",
+    "-outdir", "build/generated-src/java", "-o", "build/generated-src/cpp/sphinxbase_wrap.c",
 	"$sphinxbase_home/swig/sphinxbase.i"
 }
 
-task swigPs(type: Exec) {
+task swigSbCsharp(type: Exec) {
+    commandLine 'swig',
+	"-I$sphinxbase_home/include", "-I$sphinxbase_home/swig",
+	"-csharp", "-dllimport", "android-pocketsphinx.so", "-namespace", "SphinxBase",
+	"-outdir", "build/generated-src/csharp", "-o", "build/generated-src/cpp/sphinxbase_cs_wrap.c",
+	"$sphinxbase_home/swig/sphinxbase.i"
+}
+
+task swigPsJava(type: Exec) {
     commandLine 'swig',
         "-I$sphinxbase_home/swig",
         "-I$pocketsphinx_home/include",
@@ -67,4 +84,14 @@ task swigPs(type: Exec) {
         "$pocketsphinx_home/swig/pocketsphinx.i"
 }
 
-preBuild.dependsOn mkdir, swigSb, swigPs
+task swigPsCsharp(type: Exec) {
+    commandLine 'swig',
+        "-I$sphinxbase_home/swig",
+        "-I$pocketsphinx_home/include",
+        "-I$pocketsphinx_home/swig",
+        "-csharp", "-dllimport", "android-pocketsphinx.so", "-namespace", "PocketSphinx",
+        "-outdir", "build/generated-src/csharp", "-o", "build/generated-src/cpp/pocketsphinx_cs_wrap.c",
+        "$pocketsphinx_home/swig/pocketsphinx.i"
+}
+
+preBuild.dependsOn mkdir, swigSbJava, swigPsJava, swigSbCsharp, swigPsCsharp
