@@ -335,6 +335,7 @@ public class SpeechRecognizer {
             decoder.startUtt();
             short[] buffer = new short[bufferSize];
             boolean inSpeech = decoder.getInSpeech();
+            boolean somethingReceived = false;
 
             // Skip the first buffer, usually zeroes
             recorder.read(buffer, 0, buffer.length);
@@ -354,15 +355,19 @@ public class SpeechRecognizer {
                     // }
                     // Log.e("!!!!!!!!", "Level: " + max);
                     
-                    if (decoder.getInSpeech() != inSpeech) {
-                        inSpeech = decoder.getInSpeech();
+                    boolean newInSpeech = decoder.getInSpeech();
+                    if (newInSpeech != inSpeech) {
+                        inSpeech = newInSpeech;
                         mainHandler.post(new InSpeechChangeEvent(inSpeech));
                     }
 
-                    if (inSpeech)
+                    if (inSpeech || !somethingReceived)
                         remainingSamples = timeoutSamples;
 
                     final Hypothesis hypothesis = decoder.hyp();
+                    if (hypothesis != null) {
+                        somethingReceived = true;
+                    }
                     mainHandler.post(new ResultEvent(hypothesis, false));
                 }
 

@@ -69,7 +69,7 @@ task swigSbJava(type: Exec) {
 task swigSbCsharp(type: Exec) {
     commandLine 'swig',
 	"-I$sphinxbase_home/include", "-I$sphinxbase_home/swig",
-	"-csharp", "-dllimport", "android-pocketsphinx.so", "-namespace", "SphinxBase",
+	"-csharp", "-dllimport", "sphinxbase.dll", "-namespace", "SphinxBase",
 	"-outdir", "build/generated-src/csharp", "-o", "build/generated-src/cpp/sphinxbase_cs_wrap.c",
 	"$sphinxbase_home/swig/sphinxbase.i"
 }
@@ -89,9 +89,10 @@ task swigPsCsharp(type: Exec) {
         "-I$sphinxbase_home/swig",
         "-I$pocketsphinx_home/include",
         "-I$pocketsphinx_home/swig",
-        "-csharp", "-dllimport", "android-pocketsphinx.so", "-namespace", "PocketSphinx",
+        "-csharp", "-dllimport", "pocketsphinx.dll", "-namespace", "PocketSphinx",
         "-outdir", "build/generated-src/csharp", "-o", "build/generated-src/cpp/pocketsphinx_cs_wrap.c",
         "$pocketsphinx_home/swig/pocketsphinx.i"
 }
 
 preBuild.dependsOn mkdir, swigSbJava, swigPsJava, swigSbCsharp, swigPsCsharp
+// preBuild.dependsOn mkdir, swigSbCsharp, swigPsCsharp
