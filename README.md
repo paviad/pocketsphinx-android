@@ -4,6 +4,18 @@ About
 This project is a wrapper for Pocketsphinx for Android providing
 high-level interface for recognizing the microphone input.
 
+Aviad Summary
+=============
+
+1. Install Android Studio, download SDK version 28, set ANDROID_SDK_ROOT to `C:\Users\USER\AppData\Local\Android\Sdk`
+2. Download swig from http://www.swig.org/download.html extract it into `C:\Local`
+3. Download gradle from https://gradle.org/releases/ extract to `C:\Gradle`
+4. Set GRADLE_HOME to `c:\gradle\gradle-6.6` (or the specific version number)
+5. Change setvars.cmd to point to the correct swig dir (c:\local\swig-4.0.2 currently)
+6. Run `setvars.cmd`
+7. Run `gradle wrapper` it will install the gradle wrapper :)
+8. Run `gradlew` followed by `gradlew build`
+
 Build
 =====
 

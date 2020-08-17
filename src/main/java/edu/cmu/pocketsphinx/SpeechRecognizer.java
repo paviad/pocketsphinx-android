@@ -340,8 +340,8 @@ public class SpeechRecognizer {
             // Skip the first buffer, usually zeroes
             recorder.read(buffer, 0, buffer.length);
 
-            while (!interrupted()
-                    && ((timeoutSamples == NO_TIMEOUT) || (remainingSamples > 0))) {
+            while (!interrupted()) {
+                    // && ((timeoutSamples == NO_TIMEOUT) || (remainingSamples > 0))) {
                 int nread = recorder.read(buffer, 0, buffer.length);
 
                 if (-1 == nread) {
@@ -367,8 +367,18 @@ public class SpeechRecognizer {
                     final Hypothesis hypothesis = decoder.hyp();
                     if (hypothesis != null) {
                         somethingReceived = true;
+						mainHandler.post(new ResultEvent(hypothesis, false));
                     }
-                    mainHandler.post(new ResultEvent(hypothesis, false));
+
+                    if ((timeoutSamples != NO_TIMEOUT) && (remainingSamples <= 0)) {
+                        decoder.endUtt();
+                        final Hypothesis hypothesis2 = decoder.hyp();
+                        if (hypothesis2 != null) {
+							mainHandler.post(new ResultEvent(hypothesis, true));
+                        }
+                        decoder.startUtt();
+                        somethingReceived = false;
+                    }
                 }
 
                 if (timeoutSamples != NO_TIMEOUT) {

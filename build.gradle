@@ -4,7 +4,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.2'
+        classpath 'com.android.tools.build:gradle:3.5.3'
     }
 }
 
@@ -18,12 +18,11 @@ allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 28
+        minSdkVersion 25
+        targetSdkVersion 29
         versionCode 5
         versionName "5prealpha"
         setProperty("archivesBaseName", "pocketsphinx-android-$versionName")
@@ -49,9 +48,10 @@ android {
 
 task mkdir {
     doLast {
-        new File('build/generated-src/csharp').mkdirs()
-        new File('build/generated-src/java').mkdirs()
-	    new File('build/generated-src/cpp').mkdirs()
+        mkdir "build"
+        mkdir "build/generated-src/csharp"
+        mkdir "build/generated-src/java"
+        mkdir "build/generated-src/cpp"
     }
 }
 
@@ -95,4 +95,3 @@ task swigPsCsharp(type: Exec) {
 }
 
 preBuild.dependsOn mkdir, swigSbJava, swigPsJava, swigSbCsharp, swigPsCsharp
-// preBuild.dependsOn mkdir, swigSbCsharp, swigPsCsharp
